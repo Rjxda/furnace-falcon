@@ -27,7 +27,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-# Check for init.f
+# Check for init.d
 if [ -d /system/etc/init.d ]; then
 	echo "[furnace] init.d detected, you're on your own!" | tee /dev/kmsg
 	exit
@@ -45,6 +45,21 @@ if [ -e /proc/sys/net/ipv4/tcp_congestion_control ]; then
 	echo "[furnace] TCP set: westwood" | tee /dev/kmsg
 else
 	echo "[furnace] what" | tee /dev/kmsg
+fi
+
+# Sweep2Dim default
+if [ -e /sys/android_touch/sweep2wake ]; then
+	if [ -e /sys/android_touch/sweep2dim ]; then
+		echo "0" > /sys/android_touch/sweep2wake
+		echo "1" > /sys/android_touch/sweep2dim
+		echo "85" > /sys/module/sweep2wake/parameters/down_kcal
+		echo "85" > /sys/module/sweep2wake/parameters/up_kcal
+		echo "[furnace] sweep2dim configured!" | tee /dev/kmsg
+	else
+		echo "[furnace] sweep2dim not found" | tee /dev/kmsg
+	fi
+else
+	echo "[furnace] sweep2wake not found" | tee /dev/kmsg
 fi
 
 # Enable powersuspend
