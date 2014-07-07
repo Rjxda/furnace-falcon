@@ -251,7 +251,7 @@ on post-fs-data
     mkdir /data/data/media 0770 media media
 
     #Import furnace extras
-    import /init.furnace.sh
+    import /init.furnace.rc
 
 on property:init.svc.surfaceflinger=stopped
     stop ppd
