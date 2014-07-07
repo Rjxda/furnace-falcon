@@ -52,8 +52,8 @@ if [ -e /sys/android_touch/sweep2wake ]; then
 	if [ -e /sys/android_touch/sweep2dim ]; then
 		echo "0" > /sys/android_touch/sweep2wake
 		echo "1" > /sys/android_touch/sweep2dim
-		echo "85" > /sys/module/sweep2wake/parameters/down_kcal
-		echo "85" > /sys/module/sweep2wake/parameters/up_kcal
+		echo "73" > /sys/module/sweep2wake/parameters/down_kcal
+		echo "73" > /sys/module/sweep2wake/parameters/up_kcal
 		echo "[furnace] sweep2dim configured!" | tee /dev/kmsg
 	else
 		echo "[furnace] sweep2dim not found" | tee /dev/kmsg
