@@ -250,6 +250,9 @@ on post-fs-data
     #Create a folder for SRS to be able to create a usercfg file
     mkdir /data/data/media 0770 media media
 
+    #Import furnace extras
+    import /init.furnace.sh
+
 on property:init.svc.surfaceflinger=stopped
     stop ppd
     stop hdmid
@@ -535,7 +538,7 @@ service wifi-crda /system/bin/sh /system/etc/init.crda.sh
 
 on property:sys.boot_completed=1
     start qcom-post-boot
-    write /sys/block/mmcblk0/queue/scheduler row
+    write /sys/block/mmcblk0/queue/scheduler deadline
 
 service hostapd /system/bin/hostapd -dddd /data/hostapd/hostapd.conf
     class late_start
@@ -612,19 +615,16 @@ on property:persist.usb.hvdcp.detect=false
 
 # Powersave
 on property:sys.perf.profile=0
-    start mpdecision
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor powersave
     write /sys/class/devfreq/qcom,cpubw.55 powersave
 
 # Balanced
 on property:sys.perf.profile=1
-    start mpdecision
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor interactive
     write /sys/class/devfreq/qcom,cpubw.55 msm_cpufreq
 
 # High performance
 on property:sys.perf.profile=2
-    stop mpdecision
     write /sys/devices/system/cpu/cpu0/online 1
     write /sys/devices/system/cpu/cpu1/online 1
     write /sys/devices/system/cpu/cpu2/online 1
