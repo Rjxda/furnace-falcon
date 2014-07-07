@@ -3128,9 +3128,3 @@ config MMI_MSM_PINMUX
 	  configuration of GPIO MUX settings on MSM chip families.
 
 endif
-
-config INTELLI_PLUG
-	bool "Enable intelli-plug cpu hotplug driver"
-	default n
-	help
-	  Generic Intelli-plug cpu hotplug driver for ARM SOCs
