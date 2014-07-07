@@ -435,4 +435,3 @@ obj-$(CONFIG_MMI_MSM_PINMUX) += mmi-pinmux.o
 obj-$(CONFIG_PM_DEBUG) += pm_debug.o
 
 obj-$(CONFIG_LCD_KCAL) += board_kcal.o kcal_ctrl.o
-obj-$(CONFIG_INTELLI_PLUG) += intelli_plug.o
