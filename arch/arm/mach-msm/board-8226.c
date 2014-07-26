@@ -63,7 +63,7 @@
 #include <linux/module.h>
 #include "../../../drivers/video/msm/mdss/mdss_fb.h"
 #include <linux/input/sweep2wake.h>
-extern int update_preset_lcdc_lut(void);
+extern void update_preset_lcdc_lut(void);
 #endif
 
 
@@ -127,11 +127,12 @@ static void __init msm8226_reserve(void)
 }
 
 #ifdef CONFIG_LCD_KCAL
-extern int g_kcal_r;
-extern int g_kcal_g;
-extern int g_kcal_b;
+int g_kcal_r = 255;
+int g_kcal_g = 255;
+int g_kcal_b = 255;
 
-extern int g_kcal_min;
+int g_kcal_min = 35;
+
 extern int down_kcal, up_kcal;
 extern void sweep2wake_pwrtrigger(void);
 
@@ -151,9 +152,6 @@ int kcal_set_values(int kcal_r, int kcal_g, int kcal_b)
 	g_kcal_g = kcal_g < g_kcal_min ? g_kcal_min : kcal_g;
 	g_kcal_b = kcal_b < g_kcal_min ? g_kcal_min : kcal_b;
 
-	if (kcal_r < g_kcal_min || kcal_g < g_kcal_min || kcal_b < g_kcal_min)
-		update_preset_lcdc_lut();
-
 	return 0;
 }
 
@@ -167,13 +165,12 @@ static int kcal_get_values(int *kcal_r, int *kcal_g, int *kcal_b)
 
 int kcal_set_min(int kcal_min)
 {
+	if (kcal_min > 255 || kcal_min < 0) {
+		kcal_min = kcal_min < 0 ? 0 : kcal_min;
+		kcal_min = kcal_min > 255 ? 255 : kcal_min;
+	}
+
 	g_kcal_min = kcal_min;
-
-	if (g_kcal_min > 255)
-		g_kcal_min = 255;
-
-	if (g_kcal_min < 0)
-		g_kcal_min = 0;
 
 	if (g_kcal_min > g_kcal_r || g_kcal_min > g_kcal_g || g_kcal_min > g_kcal_b) {
 		g_kcal_r = g_kcal_r < g_kcal_min ? g_kcal_min : g_kcal_r;
@@ -193,7 +190,8 @@ static int kcal_get_min(int *kcal_min)
 
 static int kcal_refresh_values(void)
 {
-	return update_preset_lcdc_lut();
+	update_preset_lcdc_lut();
+	return 0;
 }
 
 void kcal_send_s2d(int set)
@@ -213,6 +211,7 @@ void kcal_send_s2d(int set)
 			sweep2wake_pwrtrigger();
 
 	} else if (set == 2) {
+
 		if ((r == 255) && (g == 255) && (b == 255))
 			return;
 
