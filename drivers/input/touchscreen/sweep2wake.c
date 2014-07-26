@@ -138,7 +138,7 @@ static void detect_sweep2wake(int sweep_coord, int sweep_height, bool st)
 	int r_prev_coord = 0, r_next_coord = 0;
 	bool single_touch = st;
 
-	if ((s2w_switch) && (s2d_enabled))
+	if ((s2w_switch > 1) && (s2d_enabled))
 		s2d_enabled = 0;
 
 	if (s2w_swap_coord == 1) {
@@ -209,7 +209,7 @@ static void detect_sweep2wake(int sweep_coord, int sweep_height, bool st)
 						if (exec_count) {
 							pr_info(LOGTAG"EXEC_COUNT\n");
 							if (s2d_enabled)
-								update_preset_lcdc_lut_s2d(1);
+								kcal_send_s2d(1);
 							else
 								sweep2wake_pwrtrigger();
 							exec_count = false;
@@ -239,7 +239,7 @@ static void detect_sweep2wake(int sweep_coord, int sweep_height, bool st)
 						if (exec_count) {
 							pr_info(LOGTAG"EXEC_COUNT\n");
 							if (s2d_enabled)
-								update_preset_lcdc_lut_s2d(2);
+								kcal_send_s2d(2);
 							else
 								sweep2wake_pwrtrigger();
 							exec_count = false;

@@ -62,6 +62,7 @@
 #include <mach/kcal.h>
 #include <linux/module.h>
 #include "../../../drivers/video/msm/mdss/mdss_fb.h"
+#include <linux/input/sweep2wake.h>
 extern int update_preset_lcdc_lut(void);
 #endif
 
@@ -131,6 +132,8 @@ extern int g_kcal_g;
 extern int g_kcal_b;
 
 extern int g_kcal_min;
+extern int down_kcal, up_kcal;
+extern void sweep2wake_pwrtrigger(void);
 
 int kcal_set_values(int kcal_r, int kcal_g, int kcal_b)
 {
@@ -191,6 +194,37 @@ static int kcal_get_min(int *kcal_min)
 static int kcal_refresh_values(void)
 {
 	return update_preset_lcdc_lut();
+}
+
+void kcal_send_s2d(int set)
+{
+	int r, g, b;
+
+	r = g_kcal_r;
+	g = g_kcal_g;
+	b = g_kcal_b;
+
+	if (set == 1) {
+		r = r - down_kcal;
+		g = g - down_kcal;
+		b = b - down_kcal;
+
+		if ((r < g_kcal_min) && (g < g_kcal_min) && (b < g_kcal_min))
+			sweep2wake_pwrtrigger();
+
+	} else if (set == 2) {
+		if ((r == 255) && (g == 255) && (b == 255))
+			return;
+
+		r = r + up_kcal;
+		g = g + up_kcal;
+		b = b + up_kcal;
+	}
+
+	kcal_set_values(r, g, b);
+	update_preset_lcdc_lut();
+
+	return;
 }
 
 static struct kcal_platform_data kcal_pdata = {
