@@ -27,12 +27,6 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-# Check for init.d
-if [ -d /system/etc/init.d ]; then
-	echo "[furnace] init.d detected, you're on your own!" | tee /dev/kmsg
-	exit
-fi
-
 # Disable MPD, enable intelliplug
 if [ -e /sys/module/intelli_plug/parameters/intelli_plug_active ]; then
 	echo "1" > /sys/module/intelli_plug/parameters/intelli_plug_active
@@ -47,14 +41,14 @@ else
 	echo "[furnace] what" | tee /dev/kmsg
 fi
 
-# Sweep2Dim default
+# Sweep2Sleep default
 if [ -e /sys/android_touch/sweep2wake ]; then
 	if [ -e /sys/android_touch/sweep2dim ]; then
-		echo "0" > /sys/android_touch/sweep2wake
-		echo "1" > /sys/android_touch/sweep2dim
+		echo "2" > /sys/android_touch/sweep2wake
+		echo "0" > /sys/android_touch/sweep2dim
 		echo "73" > /sys/module/sweep2wake/parameters/down_kcal
 		echo "73" > /sys/module/sweep2wake/parameters/up_kcal
-		echo "[furnace] sweep2dim configured!" | tee /dev/kmsg
+		echo "[furnace] sweep2sleep/dim configured!" | tee /dev/kmsg
 	else
 		echo "[furnace] sweep2dim not found" | tee /dev/kmsg
 	fi
