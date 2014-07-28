@@ -12,7 +12,7 @@ ramdisk=ramdisk
 toolchain=/home/savoca/storage/toolchains/android-toolchain-eabi/bin/
 toolchain2="arm-eabi-"
 config="furnace_defconfig"
-kerneltype="zImage-dtb"
+kerneltype="zImage"
 jobcount="-j$(grep -c ^processor /proc/cpuinfo)"
 ps=2048
 base=0x00000000
@@ -63,18 +63,14 @@ if [ -f arch/arm/boot/"$kerneltype" ]; then
 	cp arch/arm/boot/"$kerneltype" out
 	rm -rf ozip/system
 	mkdir -p ozip/system/lib/modules
+	mkdir out/modules
 	find . -name "*.ko" -exec cp {} ozip/system/lib/modules \;
-	if [ -f ozip/system/lib/modules/radio-iris-transport.ko ]; then
-		echo "Modules found!"
-		echo "Doing $variant specific module changes!"
-		if [ -f ozip/system/lib/modules/wlan.ko ]; then
-			mkdir ozip/system/lib/modules/pronto
-			mv ozip/system/lib/modules/wlan.ko ozip/system/lib/modules/pronto/pronto_wlan.ko
-		else
-			echo "wlan.ko not found!"
-		fi
+	echo "Doing $variant specific module changes!"
+	if [ -f ozip/system/lib/modules/wlan.ko ]; then
+		mkdir ozip/system/lib/modules/pronto
+		mv ozip/system/lib/modules/wlan.ko ozip/system/lib/modules/pronto/pronto_wlan.ko
 	else
-		rm -rf ozip/system
+		echo "wlan.ko not found!"
 	fi
 else
 	echo "Nothing has been made..."
@@ -109,6 +105,15 @@ else
 	esac
 fi
 
+echo "Making dt.img..."
+if [ -f arch/arm/boot/"$kerneltype" ]; then
+	dtbToolCM -2 -o out/dt.img -s 2048 -p scripts/dtc/ arch/arm/boot/
+	echo "dt.img created..."
+else
+	echo "No $kerneltype found..."
+	exit 0;
+fi
+
 echo "Making ramdisk..."
 if [ -d $ramdisk ]; then
 	mkbootfs $ramdisk | gzip > out/ramdisk.gz
@@ -119,7 +124,7 @@ fi
 
 echo "Making boot.img..."
 if [ -f out/"$kerneltype" ]; then
-	mkbootimg --kernel out/"$kerneltype" --ramdisk out/ramdisk.gz --cmdline "$cmdline" --base $base --pagesize $ps --ramdisk_offset $ramdisk_offset --tags_offset $tags_offset -o ozip/boot.img
+	mkbootimg --kernel out/"$kerneltype" --ramdisk out/ramdisk.gz --cmdline "$cmdline" --base $base --pagesize $ps --ramdisk_offset $ramdisk_offset --tags_offset $tags_offset --dt out/dt.img -o ozip/boot.img
 else
 	echo "No $kerneltype found..."
 	exit 0;
